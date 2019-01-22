@@ -35,7 +35,6 @@ public class VCodeServiceImpl implements VCodeService {
     @Override
     public ResultModel sendCode(String email) {
         ResultModel result = new ResultModel();
-        result.setSuccess(false);
 
         // 检验是否为正确格式的邮箱地址
         if (!checkEmail(email)) {

@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class ResultModel {
 
-    private boolean success = true;
+    private boolean success = false;
     private String info = "";
     private Object data = null;
 
