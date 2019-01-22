@@ -2,6 +2,7 @@ package edu.nju.yummy.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import edu.nju.yummy.entity.VCode;
+import edu.nju.yummy.model.ResultModel;
 import edu.nju.yummy.repository.UserRepository;
 import edu.nju.yummy.repository.VCodeRepository;
 import edu.nju.yummy.service.VCodeService;
@@ -32,17 +33,17 @@ public class VCodeServiceImpl implements VCodeService {
     }
 
     @Override
-    public JSONObject sendCode(String email) {
-        JSONObject result = new JSONObject();
-        result.put("result", "failed");
+    public ResultModel sendCode(String email) {
+        ResultModel result = new ResultModel();
+        result.setSuccess(false);
 
         // 检验是否为正确格式的邮箱地址
         if (!checkEmail(email)) {
-            result.put("info", "邮箱格式不正确");
+            result.setInfo("邮箱格式不正确");
             return result;
         }
         if (userRepository.findByEmail(email) != null) {
-            result.put("info", "邮箱已被注册");
+            result.setInfo("邮箱已被注册");
             return result;
         }
 
@@ -56,8 +57,8 @@ public class VCodeServiceImpl implements VCodeService {
             // 发送
             try {
                 sendEmail(email, randomStr);
-                result.put("result", "success");
-                result.put("info", "验证码已成功发送");
+                result.setSuccess(true);
+                result.setInfo("验证码已成功发送");
                 // 保存发送记录
                 if (vCode == null) {
                     vCode = new VCode();
@@ -70,11 +71,11 @@ public class VCodeServiceImpl implements VCodeService {
             } catch (Exception e) {
                 e.printStackTrace();
                 // 发送遇到问题
-                result.put("info", "验证码发送出现错误");
+                result.setInfo("验证码发送出现错误");
             }
         } else {
             // 1分钟之内发送过验证码
-            result.put("info", "验证码发送过于频繁，请稍后再试");
+            result.setInfo("验证码发送过于频繁，请稍后再试");
         }
         return result;
     }
