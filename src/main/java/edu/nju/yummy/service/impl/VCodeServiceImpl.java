@@ -1,7 +1,8 @@
 package edu.nju.yummy.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import edu.nju.yummy.model.VCode;
+import edu.nju.yummy.entity.VCode;
+import edu.nju.yummy.repository.UserRepository;
 import edu.nju.yummy.repository.VCodeRepository;
 import edu.nju.yummy.service.VCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +18,15 @@ import java.util.regex.Pattern;
 @Service
 public class VCodeServiceImpl implements VCodeService {
 
+    private final UserRepository userRepository;
     private final VCodeRepository vCodeRepository;
     private final JavaMailSender mailSender;
     @Value("${spring.mail.username}")
     private String from;
 
     @Autowired
-    public VCodeServiceImpl(VCodeRepository vCodeRepository, JavaMailSender mailSender) {
+    public VCodeServiceImpl(UserRepository userRepository, VCodeRepository vCodeRepository, JavaMailSender mailSender) {
+        this.userRepository = userRepository;
         this.vCodeRepository = vCodeRepository;
         this.mailSender = mailSender;
     }
@@ -36,6 +39,10 @@ public class VCodeServiceImpl implements VCodeService {
         // 检验是否为正确格式的邮箱地址
         if (!checkEmail(email)) {
             result.put("info", "邮箱格式不正确");
+            return result;
+        }
+        if (userRepository.findByEmail(email) != null) {
+            result.put("info", "邮箱已被注册");
             return result;
         }
 
@@ -85,7 +92,7 @@ public class VCodeServiceImpl implements VCodeService {
         message.setSubject("[Yummy 订餐平台] 验证码");
         message.setText("Yummy 已收到您的会员注册申请，下面是为您生成的验证码：\n\n" +
                 code + "\n\n" +
-                "请在注册页面输入此验证码来重置密码。");
+                "请在注册页面输入此验证码。");
         mailSender.send(message);
     }
 

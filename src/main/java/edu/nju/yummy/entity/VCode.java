@@ -1,4 +1,4 @@
-package edu.nju.yummy.model;
+package edu.nju.yummy.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,4 +25,5 @@ public class VCode {
     private String num;
     @Column(nullable = false)
     private Timestamp sendTime = new Timestamp(System.currentTimeMillis());
+
 }
