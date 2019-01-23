@@ -2,12 +2,10 @@ package edu.nju.yummy.service.impl;
 
 import edu.nju.yummy.entity.AccountEntity;
 import edu.nju.yummy.entity.UserEntity;
-import edu.nju.yummy.entity.VCode;
 import edu.nju.yummy.model.ResultModel;
 import edu.nju.yummy.repository.AccountRepository;
 import edu.nju.yummy.repository.AddressRepository;
 import edu.nju.yummy.repository.UserRepository;
-import edu.nju.yummy.repository.VCodeRepository;
 import edu.nju.yummy.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,40 +14,14 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final VCodeRepository vCodeRepository;
     private final AddressRepository addressRepository;
     private final AccountRepository accountRepository;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, VCodeRepository vCodeRepository, AddressRepository addressRepository, AccountRepository accountRepository) {
+    public UserServiceImpl(UserRepository userRepository, AddressRepository addressRepository, AccountRepository accountRepository) {
         this.userRepository = userRepository;
-        this.vCodeRepository = vCodeRepository;
         this.addressRepository = addressRepository;
         this.accountRepository = accountRepository;
-    }
-
-    @Override
-    public ResultModel register(String email, String password, String codeNum) {
-        ResultModel result = new ResultModel();
-
-        VCode vCode = vCodeRepository.findByEmail(email);
-        if (vCode == null) {
-            // 未获取过验证码
-            result.setInfo("请先获取验证码");
-        } else if (! codeNum.equals(vCode.getNum())){
-            // 验证码不符合
-            result.setInfo("请先获取验证码");
-        } else {
-            // 注册新用户
-            UserEntity user = new UserEntity();
-            user.setEmail(email);
-            user.setPassword(password);
-            userRepository.save(user);
-            vCodeRepository.delete(vCode);
-            result.setSuccess(true);
-            result.setInfo("注册成功");
-        }
-        return result;
     }
 
     @Override
@@ -82,14 +54,4 @@ public class UserServiceImpl implements UserService {
         return result;
     }
 
-    @Override
-    public boolean changePassword(int userId, String oldPassword, String newPassword) {
-        UserEntity userEntity = userRepository.findById(userId).orElse(null);
-        if (userEntity != null && oldPassword.equals(userEntity.getPassword())) {
-            userEntity.setPassword(newPassword);
-            userRepository.save(userEntity);
-            return true;
-        }
-        return false;
-    }
 }

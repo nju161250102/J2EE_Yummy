@@ -1,8 +1,13 @@
 package edu.nju.yummy.service.impl;
 
+import edu.nju.yummy.entity.KeyRecord;
 import edu.nju.yummy.entity.UserEntity;
+import edu.nju.yummy.entity.VCode;
 import edu.nju.yummy.model.ResultModel;
+import edu.nju.yummy.repository.KeyRecordRepository;
+import edu.nju.yummy.repository.RestaurantRepository;
 import edu.nju.yummy.repository.UserRepository;
+import edu.nju.yummy.repository.VCodeRepository;
 import edu.nju.yummy.service.LogInService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,37 +15,89 @@ import org.springframework.stereotype.Service;
 @Service
 public class LogInServiceImpl implements LogInService {
 
+    private final RestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
+    private final VCodeRepository vCodeRepository;
+    private final KeyRecordRepository keyRecordRepository;
 
     @Autowired
-    public LogInServiceImpl(UserRepository userRepository) {
+    public LogInServiceImpl(RestaurantRepository restaurantRepository, KeyRecordRepository keyRecordRepository, UserRepository userRepository, VCodeRepository vCodeRepository) {
+        this.restaurantRepository = restaurantRepository;
         this.userRepository = userRepository;
+        this.vCodeRepository = vCodeRepository;
+        this.keyRecordRepository = keyRecordRepository;
     }
 
     @Override
-    public ResultModel userLogin(String email, String password) {
+    public ResultModel userRegister(String email, String password, String codeNum) {
         ResultModel result = new ResultModel();
-        UserEntity user = userRepository.findByEmail(email);
-        if (user == null) {
-            result.setInfo("用户尚未注册");
+
+        VCode vCode = vCodeRepository.findByEmail(email);
+        if (vCode == null) {
+            // 未获取过验证码
+            result.setInfo("请先获取验证码");
+        } else if (! codeNum.equals(vCode.getNum())){
+            // 验证码不符合
+            result.setInfo("请先获取验证码");
         } else {
-            if (! password.equals(user.getPassword())) {
-                result.setInfo("密码错误，请重试");
-            } else {
-                result.setSuccess(true);
-                result.setInfo("登录成功");
-            }
+            // 注册新用户
+            UserEntity user = new UserEntity();
+            user.setEmail(email);
+            user = userRepository.save(user);
+            vCodeRepository.delete(vCode);
+            KeyRecord record = new KeyRecord(null, KeyRecord.USER, user.getId(), email, password);
+            keyRecordRepository.save(record);
+            result.setSuccess(true);
+            result.setInfo("注册成功");
         }
         return result;
     }
 
     @Override
-    public ResultModel restaurantLogin(String id, String password) {
-        return null;
+    public ResultModel userLogin(String email, String password) {
+        return login(KeyRecord.USER, email, password);
+    }
+
+    @Override
+    public boolean userChangeKey(int userId, String oldPassword, String newPassword) {
+        return changeKey(KeyRecord.USER, userId, oldPassword, newPassword);
+    }
+
+    @Override
+    public ResultModel restaurantLogin(String stringId, String password) {
+        return login(KeyRecord.RESTAURANT, stringId, password);
+    }
+
+    @Override
+    public boolean restaurantChangeKey(int id, String oldPassword, String newPassword) {
+        return changeKey(KeyRecord.RESTAURANT, id, oldPassword, newPassword);
     }
 
     @Override
     public ResultModel adminLogin(String adminName, String password) {
-        return null;
+        return login(KeyRecord.ADMIN, adminName, password);
+    }
+
+    private ResultModel login(int type, String username, String password) {
+        ResultModel result = new ResultModel();
+        Integer userId = keyRecordRepository.checkIdentity(type, username, password);
+        if (userId == null) {
+            result.setInfo("用户名或密码错误，请重试");
+        } else {
+            result.setSuccess(true);
+            result.setInfo("登录成功");
+            result.setData(userId);
+        }
+        return result;
+    }
+
+    private boolean changeKey(int type, int id, String oldPassword, String newPassword) {
+        KeyRecord record = keyRecordRepository.findByIdentityAndLogId(type, id);
+        if (record != null && oldPassword.equals(record.getPassword())) {
+            record.setPassword(newPassword);
+            keyRecordRepository.save(record);
+            return true;
+        }
+        return false;
     }
 }
