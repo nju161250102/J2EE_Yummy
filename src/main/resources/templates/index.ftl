@@ -26,11 +26,17 @@
         <div align="center">
             <form method="post" action="/login" style="width: 350px">
                 <div style="background-color: #fff;border: 1px solid #d8dee2;padding: 20px">
-                    <label><input type="email" name="username" placeholder="用户名" style="margin-bottom: 10px"></label>
+                    <label><input type="text" name="username" placeholder="用户名" style="margin-bottom: 10px"></label>
                     <label><input type="password" name="password" placeholder="密码" style="margin-bottom: 10px"></label>
+                    <select name="type" title="用户身份">
+                        <option value="user" selected>会员</option>
+                        <option value="restaurant">餐厅</option>
+                        <option value="admin">经理</option>
+                    </select>
                     <input type="submit" value="登录" style="height: 40px;width: 50%">
                 </div>
             </form>
+            <h3 id="info">${info!}</h3>
         </div>
     </footer>
 </article>
