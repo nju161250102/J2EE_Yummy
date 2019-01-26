@@ -10,8 +10,8 @@
 </head>
 <body>
 <nav class="demo">
-    <a href="#" class="brand">
-        <span>Picnic CSS</span>
+    <a href="/user/index" class="brand">
+        <span>Yummy!</span>
     </a>
     <div class="menu">
         <a href="/user/index" class="pseudo button">餐厅列表</a>
@@ -19,5 +19,20 @@
         <a href="/user/info" class="pseudo button">个人资料</a>
     </div>
 </nav>
+<div class="flex four" style="padding: 70px 100px">
+    <#assign json=data?eval />
+    <#list json as item>
+    <article class="card">
+        <header>
+            <h4>${item.name}</h4>
+            <p>地址：${item.address}</p>
+            <p>联系电话：${item.phone}</p>
+        </header>
+        <footer>
+            <a class="button" href="/user/restaurant/${item.id}">进入</a>
+        </footer>
+    </article>
+    </#list>
+</div>
 </body>
 </html>

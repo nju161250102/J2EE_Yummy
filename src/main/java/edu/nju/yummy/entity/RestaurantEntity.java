@@ -13,6 +13,10 @@ import javax.persistence.*;
 @NoArgsConstructor
 public class RestaurantEntity {
 
+    public static int UNCHECKED = 0;
+    public static int CHECKED = 1;
+    public static int NOTPASS = 2;
+
     @Id
     @GeneratedValue
     private Integer id;
@@ -27,6 +31,6 @@ public class RestaurantEntity {
     @Column(nullable = false, length = 13)
     private String phone;
     @Column
-    private int status;
+    private int status = RestaurantEntity.UNCHECKED;
 
 }

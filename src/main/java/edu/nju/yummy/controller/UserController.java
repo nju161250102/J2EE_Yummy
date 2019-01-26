@@ -1,7 +1,10 @@
 package edu.nju.yummy.controller;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import edu.nju.yummy.model.ResultModel;
 import edu.nju.yummy.service.LogInService;
+import edu.nju.yummy.service.RestaurantService;
 import edu.nju.yummy.service.UserService;
 import edu.nju.yummy.service.VCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,26 +13,21 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/user")
 public class UserController {
 
+    private final UserService userService;
     @Autowired
-    private UserService userService;
-    @Autowired
-    private LogInService logInService;
-    @Autowired
-    private VCodeService vCodeService;
+    private RestaurantService restaurantService;
+    private final VCodeService vCodeService;
 
-    @PostMapping("/register")
-    public String register(HttpServletRequest request, Model model) {
-        String email = request.getParameter("mail");
-        String password = request.getParameter("password");
-        String code = request.getParameter("code");
-        ResultModel result = logInService.userRegister(email, password, code);
-        model.addAttribute("info", result.getInfo());
-        return "register/user";
+    @Autowired
+    public UserController(UserService userService, VCodeService vCodeService) {
+        this.userService = userService;
+        this.vCodeService = vCodeService;
     }
 
     @ResponseBody
@@ -37,5 +35,20 @@ public class UserController {
     public String getCode(@ModelAttribute("mail")String email) {
         ResultModel result = vCodeService.sendCode(email);
         return result.getInfo();
+    }
+
+    @GetMapping("/index")
+    public String getIndexPage(Model model) {
+        JSONArray list = restaurantService.getAvailableList();
+        model.addAttribute("data", list.toJSONString());
+        return "user/index";
+    }
+
+    @GetMapping("/info")
+    public String getInfoPage(Model model, HttpSession session) {
+        int userId = (int) session.getAttribute("id");
+        JSONObject user = userService.getUser(userId);
+        model.addAttribute("user", user.toJSONString());
+        return "user/info";
     }
 }

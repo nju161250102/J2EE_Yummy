@@ -1,5 +1,7 @@
 package edu.nju.yummy.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import edu.nju.yummy.entity.AccountEntity;
 import edu.nju.yummy.entity.UserEntity;
 import edu.nju.yummy.model.ResultModel;
@@ -50,6 +52,17 @@ public class UserServiceImpl implements UserService {
             }
             // 更新用户
             userRepository.save(user);
+        }
+        return result;
+    }
+
+    @Override
+    public JSONObject getUser(int userId) {
+        JSONObject result = new JSONObject();
+        UserEntity user;
+        user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            result = (JSONObject) JSON.toJSON(user);
         }
         return result;
     }
