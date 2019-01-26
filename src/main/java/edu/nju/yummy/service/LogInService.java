@@ -12,6 +12,8 @@ public interface LogInService {
 
     ResultModel userLogin(String email, String password);
 
+    ResultModel restaurantRegister(String name, String password, String description, String address, String phone);
+
     boolean restaurantChangeKey(int id, String oldPassword, String newPassword);
 
     ResultModel restaurantLogin(String stringId, String password);

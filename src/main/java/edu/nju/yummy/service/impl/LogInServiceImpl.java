@@ -1,6 +1,7 @@
 package edu.nju.yummy.service.impl;
 
 import edu.nju.yummy.entity.KeyRecord;
+import edu.nju.yummy.entity.RestaurantEntity;
 import edu.nju.yummy.entity.UserEntity;
 import edu.nju.yummy.entity.VCode;
 import edu.nju.yummy.model.ResultModel;
@@ -38,7 +39,7 @@ public class LogInServiceImpl implements LogInService {
             result.setInfo("请先获取验证码");
         } else if (! codeNum.equals(vCode.getNum())){
             // 验证码不符合
-            result.setInfo("请先获取验证码");
+            result.setInfo("验证码错误");
         } else {
             // 注册新用户
             UserEntity user = new UserEntity();
@@ -56,6 +57,29 @@ public class LogInServiceImpl implements LogInService {
     @Override
     public ResultModel userLogin(String email, String password) {
         return login(KeyRecord.USER, email, password);
+    }
+
+    @Override
+    public ResultModel restaurantRegister(String name, String password, String description, String address, String phone) {
+        ResultModel result = new ResultModel();
+        try {
+            long count = restaurantRepository.count();
+            RestaurantEntity restaurant = new RestaurantEntity();
+            restaurant.setStringId(String.format("%07d", count + 1));
+            restaurant.setName(name);
+            restaurant.setAddress(address);
+            restaurant.setDescription(description);
+            restaurant.setPhone(phone);
+            restaurant = restaurantRepository.save(restaurant);
+            KeyRecord keyRecord = new KeyRecord(null, KeyRecord.RESTAURANT, restaurant.getId(), restaurant.getStringId(), password);
+            keyRecordRepository.save(keyRecord);
+            result.setSuccess(true);
+            result.setInfo("注册成功，您分配的id为：" + restaurant.getStringId());
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setInfo("注册失败");
+        }
+        return result;
     }
 
     @Override

@@ -7,14 +7,14 @@
     <script type="text/javascript" src="/static/js/jquery-1.12.2.min.js"></script>
     <script>
         function getCode() {
-            $.post("/user/getCode", {mail: $("#email").text()}, function(data, status){
-                $("#info").text(data)
+            $.post("/user/code", {mail: $("#email").val()}, function(data, status){
+                $("#info").val(data);
             });
         }
     </script>
 </head>
 <body>
-<article class="card" style="padding-top: 10px">
+<article class="card" style="padding-top: 20px">
     <header>
         <div align="center">
             <form method="post" action="/user/register" style="width: 350px">
@@ -25,11 +25,14 @@
                             <input type="text" name="code" placeholder="验证码">
                         </div>
                         <div class="half">
-                            <button onclick="getCode()">获取验证码</button>
+                            <button type="button" onclick="getCode()" style="margin: 0">获取验证码</button>
                         </div>
                     </div>
                     <label><input type="password" name="password" placeholder="设置密码" style="margin-bottom: 10px"></label>
                     <input class='success' type="submit" value="注册" style="height: 40px;width: 50%">
+                    <a href="/index">
+                        <input id="return" class='warning' type="button" value="返回" style="height: 40px;width: 50%">
+                    </a>
                 </div>
             </form>
         </div>

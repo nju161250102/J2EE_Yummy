@@ -1,0 +1,74 @@
+package edu.nju.yummy.controller;
+
+import edu.nju.yummy.model.ResultModel;
+import edu.nju.yummy.service.LogInService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+@Controller
+public class LogInController {
+
+    private final LogInService logInService;
+
+    @Autowired
+    public LogInController(LogInService logInService) {
+        this.logInService = logInService;
+    }
+
+    @PostMapping("/login")
+    public String login(HttpServletRequest request, Model model, HttpSession session) {
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        String type = request.getParameter("type");
+
+        ResultModel result = new ResultModel();
+        if ("user".equals(type)) {
+            result = logInService.userLogin(username, password);
+            if (result.isSuccess()) {
+                session.setAttribute("id", result.getData());
+                return "redirect:user/index";
+            }
+        } else if ("restaurant".equals(type)) {
+            result = logInService.restaurantLogin(username, password);
+            if (result.isSuccess()) {
+                session.setAttribute("id", result.getData());
+                return "redirect:restaurant/index";
+            }
+        } else if ("admin".equals(type)) {
+            result = logInService.adminLogin(username, password);
+            if (result.isSuccess()) {
+                session.setAttribute("id", result.getData());
+                return "redirect:admin/index";
+            }
+        }
+        model.addAttribute("info", result.getInfo());
+        return "redirect:/index";
+    }
+
+    @PostMapping("/user/register")
+    public String userRegister(HttpServletRequest request, Model model) {
+        String email = request.getParameter("mail");
+        String password = request.getParameter("password");
+        String code = request.getParameter("code");
+        ResultModel result = logInService.userRegister(email, password, code);
+        model.addAttribute("info", result.getInfo());
+        return "register/user";
+    }
+
+    @PostMapping("/restaurant/register")
+    public String restaurantRegister(HttpServletRequest request, Model model) {
+        String name = request.getParameter("name");
+        String password = request.getParameter("password");
+        String address = request.getParameter("address");
+        String description = request.getParameter("description");
+        String phone = request.getParameter("phone");
+        ResultModel result = logInService.restaurantRegister(name, password, description, address, phone);
+        model.addAttribute("info", result.getInfo());
+        return "register/restaurant";
+    }
+}

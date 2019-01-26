@@ -62,10 +62,10 @@ public class VCodeServiceImpl implements VCodeService {
                 if (vCode == null) {
                     vCode = new VCode();
                     vCode.setEmail(email);
-                    vCode.setNum(randomStr);
                 } else {
                     vCode.setSendTime(new Timestamp(System.currentTimeMillis()));
                 }
+                vCode.setNum(randomStr);
                 vCodeRepository.save(vCode);
             } catch (Exception e) {
                 e.printStackTrace();
