@@ -12,7 +12,10 @@ public interface RestaurantService {
     // 获取审核通过的列表
     JSONArray getAvailableList();
 
+    JSONArray getUncheckedList();
+
     //
     JSONObject getInfo(int id);
 
+    boolean check(String stringId, boolean isPassed);
 }

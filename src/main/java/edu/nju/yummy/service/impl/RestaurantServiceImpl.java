@@ -34,7 +34,31 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
+    public JSONArray getUncheckedList() {
+        List<RestaurantEntity> list = restaurantRepository.findAllByStatus(RestaurantEntity.UNCHECKED);
+        return (JSONArray) JSON.toJSON(list);
+    }
+
+    @Override
     public JSONObject getInfo(int id) {
         return null;
+    }
+
+    @Override
+    public boolean check(String stringId, boolean isPassed) {
+        try {
+            List<RestaurantEntity> restaurantList = restaurantRepository.findAllByStringId(stringId);
+            for (RestaurantEntity restaurant: restaurantList) {
+                if (restaurant.getStatus() == RestaurantEntity.UNCHECKED) {
+                    restaurant.setStatus(isPassed ? RestaurantEntity.CHECKED : RestaurantEntity.NOTPASS);
+                    restaurantRepository.save(restaurant);
+                    return true;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }
