@@ -1,21 +1,23 @@
 package edu.nju.yummy.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import edu.nju.yummy.entity.AddressEntity;
-import edu.nju.yummy.model.AddressModel;
+import edu.nju.yummy.entity.UserEntity;
 import edu.nju.yummy.repository.AddressRepository;
+import edu.nju.yummy.repository.UserRepository;
 import edu.nju.yummy.service.AddressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class AddressServiceImpl implements AddressService {
 
     private final AddressRepository addressRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     public AddressServiceImpl(AddressRepository addressRepository) {
@@ -23,23 +25,16 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public List<AddressModel> getAddressList(int userId) {
-        List<AddressModel> addressList = new ArrayList<>();
-        // 将数据库数据转化为显示模型
-        for (AddressEntity address: addressRepository.findAllByUserId(userId)) {
-            addressList.add(new AddressModel(
-                    address.getId(),
-                    address.getDetail(),
-                    address.getStatus() == AddressEntity.DEFAULT));
-        }
-        return addressList;
+    public JSONArray getAddressList(int userId) {
+        List<AddressEntity> addressList = addressRepository.findAllByUserId(userId);
+        return (JSONArray) JSON.toJSON(addressList);
     }
 
     @Override
     public boolean setDefault(int addressId) {
         try {
             AddressEntity address = addressRepository.getOne(addressId);
-            AddressEntity oldDefault = addressRepository.findDefaultAddress(address.getUserId());
+            AddressEntity oldDefault = addressRepository.defaultAddress(address.getUserId());
             // 如果已经存在默认地址
             if (oldDefault != null) {
                 // 将之前的默认地址取消
@@ -57,20 +52,20 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public boolean saveAddress(int userId, JSONArray addressList) {
+    public boolean saveAddress(int userId, String address) {
         try {
-            addressRepository.deleteAllByUserId(userId);
-            for (Object obj: addressList) {
-                JSONObject jsonObject = (JSONObject) obj;
-                AddressEntity addressEntity = new AddressEntity();
-                addressEntity.setId(jsonObject.getInteger("id"));
-                addressEntity.setDetail(jsonObject.getString("detail"));
-                addressEntity.setUserId(userId);
-                addressEntity.setStatus(jsonObject.getInteger("status"));
-                addressRepository.save(addressEntity);
+            AddressEntity addressEntity = new AddressEntity();
+            addressEntity.setDetail(address);
+            addressEntity.setUserId(userId);
+            addressRepository.save(addressEntity);
+            UserEntity user = userRepository.getOne(userId);
+            if (user.getStatus() == UserEntity.INCOMPLETE) {
+                user.setStatus(UserEntity.NORMAL);
+                userRepository.save(user);
             }
             return true;
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }

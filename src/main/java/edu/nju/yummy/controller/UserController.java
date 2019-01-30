@@ -3,7 +3,7 @@ package edu.nju.yummy.controller;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import edu.nju.yummy.model.ResultModel;
-import edu.nju.yummy.service.LogInService;
+import edu.nju.yummy.service.AddressService;
 import edu.nju.yummy.service.RestaurantService;
 import edu.nju.yummy.service.UserService;
 import edu.nju.yummy.service.VCodeService;
@@ -20,14 +20,16 @@ import javax.servlet.http.HttpSession;
 public class UserController {
 
     private final UserService userService;
-    @Autowired
-    private RestaurantService restaurantService;
+    private final RestaurantService restaurantService;
     private final VCodeService vCodeService;
+    private final AddressService addressService;
 
     @Autowired
-    public UserController(UserService userService, VCodeService vCodeService) {
+    public UserController(UserService userService, VCodeService vCodeService, RestaurantService restaurantService, AddressService addressService) {
         this.userService = userService;
         this.vCodeService = vCodeService;
+        this.restaurantService = restaurantService;
+        this.addressService = addressService;
     }
 
     @ResponseBody
@@ -48,7 +50,21 @@ public class UserController {
     public String getInfoPage(Model model, HttpSession session) {
         int userId = (int) session.getAttribute("id");
         JSONObject user = userService.getUser(userId);
-        model.addAttribute("user", user.toJSONString());
+        model.addAttribute("userInfo", user.toJSONString());
+        JSONArray address = addressService.getAddressList(userId);
+        model.addAttribute("userAddress", address.toJSONString());
         return "user/info";
+    }
+
+    @PostMapping("/update")
+    public String updateInfo(Model model, HttpServletRequest request, HttpSession session) {
+        int userId = (int) session.getAttribute("id");
+        String name = request.getParameter("name");
+        String phone = request.getParameter("phone");
+        String cardNum = request.getParameter("cardNum");
+        String cardPassword = request.getParameter("cardPassword");
+        ResultModel result = userService.updateInfo(userId, name, phone, cardNum, cardPassword);
+        model.addAttribute("info", result.getData());
+        return "redirect:/user/info";
     }
 }

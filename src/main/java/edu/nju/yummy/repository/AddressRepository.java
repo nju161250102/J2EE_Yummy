@@ -17,6 +17,7 @@ public interface AddressRepository extends JpaRepository<AddressEntity, Integer>
     List<AddressEntity> findAllByUserId(int userId);
 
     @Nullable
-    @Query("SELECT a FROM AddressEntity a WHERE a.userId = :userId and a.status = a.DEFAULT")
-    AddressEntity findDefaultAddress(@Param("userId") int userId);
+    @Query("SELECT a FROM AddressEntity a WHERE a.userId = :userId and a.status = 1")
+    AddressEntity defaultAddress(@Param("userId") int userId);
+
 }
