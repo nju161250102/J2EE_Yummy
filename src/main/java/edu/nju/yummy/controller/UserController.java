@@ -3,10 +3,7 @@ package edu.nju.yummy.controller;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import edu.nju.yummy.model.ResultModel;
-import edu.nju.yummy.service.AddressService;
-import edu.nju.yummy.service.RestaurantService;
-import edu.nju.yummy.service.UserService;
-import edu.nju.yummy.service.VCodeService;
+import edu.nju.yummy.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,13 +20,17 @@ public class UserController {
     private final RestaurantService restaurantService;
     private final VCodeService vCodeService;
     private final AddressService addressService;
+    private final DishService dishService;
+    @Autowired
+    private OrderService orderService;
 
     @Autowired
-    public UserController(UserService userService, VCodeService vCodeService, RestaurantService restaurantService, AddressService addressService) {
+    public UserController(UserService userService, VCodeService vCodeService, RestaurantService restaurantService, AddressService addressService, DishService dishService) {
         this.userService = userService;
         this.vCodeService = vCodeService;
         this.restaurantService = restaurantService;
         this.addressService = addressService;
+        this.dishService = dishService;
     }
 
     @ResponseBody
@@ -56,6 +57,11 @@ public class UserController {
         return "user/info";
     }
 
+    @GetMapping("/order")
+    public String getOrderPage() {
+        return "user/order";
+    }
+
     @PostMapping("/update")
     public String updateInfo(Model model, HttpServletRequest request, HttpSession session) {
         int userId = (int) session.getAttribute("id");
@@ -66,5 +72,17 @@ public class UserController {
         ResultModel result = userService.updateInfo(userId, name, phone, cardNum, cardPassword);
         model.addAttribute("info", result.getData());
         return "redirect:/user/info";
+    }
+
+    @GetMapping("/restaurant/{id}")
+    public String enterRestaurant(@PathVariable("id") int id, Model model, HttpSession session) {
+        int userId = (int) session.getAttribute("id");
+        JSONArray results = dishService.getAvailableDish(id);
+        model.addAttribute("dishList", results.toString());
+        JSONObject restaurant = restaurantService.getCheckedInfo(id);
+        model.addAttribute("restaurant", restaurant.toString());
+        JSONArray addresses = addressService.getAddressList(userId);
+        model.addAttribute("addressJson", addresses.toString());
+        return "user/restaurant";
     }
 }

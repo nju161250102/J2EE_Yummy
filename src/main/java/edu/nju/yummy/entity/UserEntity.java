@@ -22,6 +22,8 @@ public class UserEntity {
     @GeneratedValue
     private Integer id;
     @Column(nullable = false)
+    private int credit = 0;
+    @Column(nullable = false)
     private String email;
     @Column(nullable = false)
     private String name = "";

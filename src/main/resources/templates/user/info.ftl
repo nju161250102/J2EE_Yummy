@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ch">
 <head>
     <meta charset="utf-8"/>
     <title>Yummy - 会员首页</title>

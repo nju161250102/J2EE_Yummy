@@ -29,25 +29,17 @@ public class LogInController {
         ResultModel result = new ResultModel();
         if ("user".equals(type)) {
             result = logInService.userLogin(username, password);
-            if (result.isSuccess()) {
-                session.setAttribute("id", result.getData());
-                return "redirect:user/index";
-            }
         } else if ("restaurant".equals(type)) {
             result = logInService.restaurantLogin(username, password);
-            if (result.isSuccess()) {
-                session.setAttribute("id", result.getData());
-                return "redirect:restaurant/index";
-            }
         } else if ("admin".equals(type)) {
             result = logInService.adminLogin(username, password);
-            if (result.isSuccess()) {
-                session.setAttribute("id", result.getData());
-                return "redirect:admin/index";
-            }
+        }
+        if (result.isSuccess()) {
+            session.setAttribute("id", result.getData());
+            return "redirect:" + type + "/index";
         }
         model.addAttribute("info", result.getInfo());
-        return "redirect:/index";
+        return "/index";
     }
 
     @PostMapping("/user/register")

@@ -13,4 +13,6 @@ public interface RestaurantRepository extends JpaRepository<RestaurantEntity, In
     List<RestaurantEntity> findAllByStatus(int status);
 
     List<RestaurantEntity> findAllByStringId(String stringId);
+
+    RestaurantEntity findByStringIdAndStatus(String stringId, int status);
 }

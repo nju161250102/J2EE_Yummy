@@ -7,7 +7,10 @@ import edu.nju.yummy.model.ResultModel;
 public interface RestaurantService {
 
     // 信息更新
-    ResultModel updateInfo(String name, String address, String description, String phone);
+    ResultModel updateInfo(int id, String name, String address, String description, String phone);
+
+    //
+    boolean cancelUpdate(int id);
 
     // 获取审核通过的列表
     JSONArray getAvailableList();
@@ -16,6 +19,8 @@ public interface RestaurantService {
 
     //
     JSONObject getInfo(int id);
+
+    JSONObject getCheckedInfo(int id);
 
     boolean check(String stringId, boolean isPassed);
 }
