@@ -12,7 +12,7 @@ public interface LogInService {
 
     ResultModel userLogin(String email, String password);
 
-    ResultModel restaurantRegister(String name, String password, String description, String address, String phone);
+    ResultModel restaurantRegister(String name, String password, String description, String address, String phone, String cardNum, String cardPassword);
 
     boolean restaurantChangeKey(int id, String oldPassword, String newPassword);
 

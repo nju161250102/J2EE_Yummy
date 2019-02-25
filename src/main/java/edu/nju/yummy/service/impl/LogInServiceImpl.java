@@ -1,14 +1,8 @@
 package edu.nju.yummy.service.impl;
 
-import edu.nju.yummy.entity.KeyRecord;
-import edu.nju.yummy.entity.RestaurantEntity;
-import edu.nju.yummy.entity.UserEntity;
-import edu.nju.yummy.entity.VCode;
+import edu.nju.yummy.entity.*;
 import edu.nju.yummy.model.ResultModel;
-import edu.nju.yummy.repository.KeyRecordRepository;
-import edu.nju.yummy.repository.RestaurantRepository;
-import edu.nju.yummy.repository.UserRepository;
-import edu.nju.yummy.repository.VCodeRepository;
+import edu.nju.yummy.repository.*;
 import edu.nju.yummy.service.LogInService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,17 +10,19 @@ import org.springframework.stereotype.Service;
 @Service
 public class LogInServiceImpl implements LogInService {
 
+    private final AccountRepository accountRepository;
     private final RestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
     private final VCodeRepository vCodeRepository;
     private final KeyRecordRepository keyRecordRepository;
 
     @Autowired
-    public LogInServiceImpl(RestaurantRepository restaurantRepository, KeyRecordRepository keyRecordRepository, UserRepository userRepository, VCodeRepository vCodeRepository) {
+    public LogInServiceImpl(RestaurantRepository restaurantRepository, KeyRecordRepository keyRecordRepository, UserRepository userRepository, VCodeRepository vCodeRepository, AccountRepository accountRepository) {
         this.restaurantRepository = restaurantRepository;
         this.userRepository = userRepository;
         this.vCodeRepository = vCodeRepository;
         this.keyRecordRepository = keyRecordRepository;
+        this.accountRepository = accountRepository;
     }
 
     @Override
@@ -60,21 +56,27 @@ public class LogInServiceImpl implements LogInService {
     }
 
     @Override
-    public ResultModel restaurantRegister(String name, String password, String description, String address, String phone) {
+    public ResultModel restaurantRegister(String name, String password, String description, String address, String phone, String cardNum, String cardPassword) {
         ResultModel result = new ResultModel();
         try {
-            long count = restaurantRepository.count();
-            RestaurantEntity restaurant = new RestaurantEntity();
-            restaurant.setStringId(String.format("%07d", count + 1));
-            restaurant.setName(name);
-            restaurant.setAddress(address);
-            restaurant.setDescription(description);
-            restaurant.setPhone(phone);
-            restaurant = restaurantRepository.save(restaurant);
-            KeyRecord keyRecord = new KeyRecord(null, KeyRecord.RESTAURANT, restaurant.getId(), restaurant.getStringId(), password);
-            keyRecordRepository.save(keyRecord);
-            result.setSuccess(true);
-            result.setInfo("注册成功，您分配的id为：" + restaurant.getStringId());
+            AccountEntity account = accountRepository.findById(cardNum).orElse(null);
+            if (account == null || ! cardPassword.equals(account.getPassword())) {
+                result.setInfo("绑定账户出错");
+            } else {
+                long count = restaurantRepository.count();
+                RestaurantEntity restaurant = new RestaurantEntity();
+                restaurant.setStringId(String.format("%07d", count + 1));
+                restaurant.setName(name);
+                restaurant.setAddress(address);
+                restaurant.setDescription(description);
+                restaurant.setPhone(phone);
+                restaurant.setCardNum(cardNum);
+                restaurant = restaurantRepository.save(restaurant);
+                KeyRecord keyRecord = new KeyRecord(null, KeyRecord.RESTAURANT, restaurant.getId(), restaurant.getStringId(), password);
+                keyRecordRepository.save(keyRecord);
+                result.setSuccess(true);
+                result.setInfo("注册成功，您分配的id为：" + restaurant.getStringId());
+            }
         } catch (Exception e) {
             e.printStackTrace();
             result.setInfo("注册失败");

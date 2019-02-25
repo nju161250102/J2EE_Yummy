@@ -30,6 +30,8 @@ public class RestaurantEntity {
     private String description;
     @Column(nullable = false, length = 13)
     private String phone;
+    @Column(nullable = false, length = 20)
+    private String cardNum;
     @Column
     private int status = RestaurantEntity.UNCHECKED;
 

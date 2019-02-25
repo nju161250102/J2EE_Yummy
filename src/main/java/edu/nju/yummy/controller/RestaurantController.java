@@ -7,6 +7,7 @@ import com.alibaba.fastjson.serializer.SimpleDateFormatSerializer;
 import edu.nju.yummy.model.ResultModel;
 import edu.nju.yummy.service.DishService;
 import edu.nju.yummy.service.LogInService;
+import edu.nju.yummy.service.OrderService;
 import edu.nju.yummy.service.RestaurantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.sql.Date;
+import java.sql.Timestamp;
 
 @Controller
 @RequestMapping("/restaurant")
@@ -27,13 +29,16 @@ public class RestaurantController {
     private final LogInService logInService;
     private final RestaurantService restaurantService;
     private final DishService dishService;
+    private final OrderService orderService;
 
     @Autowired
-    public RestaurantController(RestaurantService restaurantService, LogInService logInService, DishService dishService) {
+    public RestaurantController(RestaurantService restaurantService, LogInService logInService, DishService dishService, OrderService orderService) {
         this.restaurantService = restaurantService;
         this.logInService = logInService;
         this.dishService = dishService;
+        this.orderService = orderService;
         mapping.put(Date.class, new SimpleDateFormatSerializer("yyyy-MM-dd"));
+        mapping.put(Timestamp.class, new SimpleDateFormatSerializer("yyyy-MM-dd HH:mm:ss"));
     }
 
     @GetMapping("/index")
@@ -50,6 +55,14 @@ public class RestaurantController {
         JSONObject restaurant = restaurantService.getInfo(id);
         model.addAttribute("restaurantInfo", restaurant.toJSONString());
         return "restaurant/info";
+    }
+
+    @GetMapping("/record")
+    public String getRecordPage(Model model, HttpSession session) {
+        int id = (int) session.getAttribute("id");
+        JSONArray orders = orderService.getOrderList(2, id, "all");
+        model.addAttribute("orderJson", JSONArray.toJSONString(orders, mapping));
+        return "restaurant/record";
     }
 
     @PostMapping("/update")

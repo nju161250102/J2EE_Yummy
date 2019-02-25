@@ -15,6 +15,8 @@
                     <label><input type="text" name="address" placeholder="地址" style="margin-bottom: 10px"></label>
                     <label><input type="text" name="phone" placeholder="联系方式" style="margin-bottom: 10px"></label>
                     <label><input type="password" name="password" placeholder="设置密码" style="margin-bottom: 10px"></label>
+                    <label><input type="text" name="cardNum" placeholder="绑定账号" style="margin-bottom: 10px"></label>
+                    <label><input type="password" name="cardPassword" placeholder="账户密码" style="margin-bottom: 10px"></label>
                     <textarea name="description" placeholder="详细描述" style="margin-bottom: 10px"></textarea>
                     <input class='success' type="submit" value="注册" style="height: 40px;width: 50%">
                     <a href="/index">
