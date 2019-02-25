@@ -17,25 +17,27 @@ import java.util.Map;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
+    private final CancelRecordRepository cancelRecordRepository;
     private final DishRepository dishRepository;
     private final OrderItemRepository orderItemRepository;
     private final RestaurantRepository restaurantRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private AccountRepository accountRepository;
+    private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, DishRepository dishRepository, OrderItemRepository orderItemRepository, RestaurantRepository restaurantRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, DishRepository dishRepository, OrderItemRepository orderItemRepository, RestaurantRepository restaurantRepository, UserRepository userRepository, AccountRepository accountRepository, CancelRecordRepository cancelRecordRepository) {
         this.orderRepository = orderRepository;
         this.dishRepository = dishRepository;
         this.orderItemRepository = orderItemRepository;
         this.restaurantRepository = restaurantRepository;
+        this.userRepository = userRepository;
+        this.accountRepository = accountRepository;
+        this.cancelRecordRepository = cancelRecordRepository;
     }
 
 
     @Override
-    public JSONArray getOrderList(int userId, String type) {
+    public JSONArray getOrderList(int userType, int id, String type) {
         int status = -1;
         if ("wait".equals(type)) {
             status = OrderEntity.WAIT;
@@ -44,8 +46,13 @@ public class OrderServiceImpl implements OrderService {
         } else if ("payed".equals(type)) {
             status = OrderEntity.PAYED;
         }
-        List<OrderEntity> orders = status != -1 ? orderRepository.findAllByUserIdAndStatus(userId, status)
-                : orderRepository.findAllByUserId(userId);
+        List<OrderEntity> orders;
+        if (userType == 1) {
+            orders = status != -1 ? orderRepository.findAllByUserIdAndStatus(id, status)
+                    : orderRepository.findAllByUserId(id);
+        } else {
+            orders = orderRepository.findAllByRestaurantId(id);
+        }
         JSONArray results = (JSONArray) JSON.toJSON(orders);
         for(int i = 0; i < results.size();i++){
             JSONObject order = results.getJSONObject(i);
@@ -63,6 +70,8 @@ public class OrderServiceImpl implements OrderService {
                 order.put("status", "已支付");
             } else if(orderStatus == OrderEntity.WAIT) {
                 order.put("status", "待支付");
+            } else if (orderStatus == OrderEntity.CONFIRMED) {
+                order.put("status", "已收货");
             }
         }
         return results;
@@ -148,7 +157,30 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void cancelOrder(int orderId) {
+        OrderEntity order = orderRepository.getOne(orderId);
+        order.setStatus(OrderEntity.CANCEL);
+        UserEntity user = userRepository.getOne(order.getUserId());
+        user.setCredit(user.getCredit() - order.getCredit());
+        AccountEntity account = accountRepository.getOne(user.getCardNum());
+        double refund = getRefund(order.getPayment(), order.getCreateTime().getTime());
+        account.setMoney(account.getMoney() + refund);
+        CancelRecord record = new CancelRecord();
+        record.setOrderId(orderId);
+        record.setPayment(order.getPayment());
+        record.setRefund(refund);
+        record.setCredit(order.getCredit());
 
+        orderRepository.save(order);
+        userRepository.save(user);
+        accountRepository.save(account);
+        cancelRecordRepository.save(record);
+    }
+
+    @Override
+    public void confirmOrder(int orderId) {
+        OrderEntity order = orderRepository.getOne(orderId);
+        order.setStatus(OrderEntity.CONFIRMED);
+        orderRepository.save(order);
     }
 
     private double getPayment(double price, int credit) {
@@ -157,5 +189,13 @@ public class OrderServiceImpl implements OrderService {
 
     private int getCredit(double price) {
         return (int) (price / 10);
+    }
+
+    private double getRefund(double payment, long orderTime) {
+        long nowTime = System.currentTimeMillis();
+        long delta = nowTime - orderTime;
+        if (delta < 300000) return 0.8 * payment;
+        else if (delta < 600000) return 0.5 * payment;
+        else return 0;
     }
 }

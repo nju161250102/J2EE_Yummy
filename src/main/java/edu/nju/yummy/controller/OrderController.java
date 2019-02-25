@@ -39,7 +39,7 @@ public class OrderController {
     public String getAllOrders(Model model, HttpServletRequest request, HttpSession session) {
         int userId = (int) session.getAttribute("id");
         String type = request.getParameter("type");
-        JSONArray orders = orderService.getOrderList(userId, type);
+        JSONArray orders = orderService.getOrderList(1, userId, type);
         model.addAttribute("orderJson", JSONArray.toJSONString(orders, mapping));
         return "user/order";
     }
@@ -84,5 +84,17 @@ public class OrderController {
         ResultModel result = orderService.payOrder(orderId, password);
         model.addAttribute("resultJson", JSON.toJSONString(result));
         return "order/result";
+    }
+
+    @GetMapping("/cancel/{id}")
+    public String cancelOrder(@PathVariable("id") int orderId) {
+        orderService.cancelOrder(orderId);
+        return "redirect:/order/info/" + orderId;
+    }
+
+    @GetMapping("/confirm/{id}")
+    public String confirmOrder(@PathVariable("id") int orderId) {
+        orderService.confirmOrder(orderId);
+        return "redirect:/order/info/" + orderId;
     }
 }

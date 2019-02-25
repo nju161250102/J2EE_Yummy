@@ -51,7 +51,14 @@
                 </form>
             </#if>
             <#if order.status==1>
+                <a class="button" href="/order/confirm/${order.id}">确认收货</a>
                 <a class="button" href="/order/cancel/${order.id}">取消订单</a>
+            </#if>
+            <#if order.status==3>
+                <a class="button dangerous" href="#">已取消</a>
+            </#if>
+            <#if order.status==4>
+                <a class="button dangerous" href="#">已收货</a>
             </#if>
         </div>
     </article>

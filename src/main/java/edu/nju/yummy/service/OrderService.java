@@ -8,7 +8,7 @@ import java.util.Map;
 
 public interface OrderService {
 
-    JSONArray getOrderList(int userId, String type);
+    JSONArray getOrderList(int userType, int id, String type);
 
     JSONObject getOrder(int orderId);
 
@@ -17,5 +17,7 @@ public interface OrderService {
     ResultModel payOrder(int orderId, String password);
 
     void cancelOrder(int orderId);
+
+    void confirmOrder(int orderId);
 
 }

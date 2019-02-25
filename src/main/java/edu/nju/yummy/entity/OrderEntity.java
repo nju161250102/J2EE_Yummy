@@ -18,6 +18,7 @@ public class OrderEntity {
     public static int PAYED = 1;
     public static int OUT_TIME = 2;
     public static int CANCEL = 3;
+    public static int CONFIRMED = 4;
 
     @Id
     @GeneratedValue

@@ -20,7 +20,8 @@
     <div>
         <form method="post" action="/order/getAll">
             <select name="type" title="订单类型">
-                <option value="wait" selected>待支付订单</option>
+                <option value="all" selected>全部订单</option>
+                <option value="wait">待支付订单</option>
                 <option value="out">超时订单</option>
                 <option value="payed">已支付订单</option>
             </select>
@@ -51,6 +52,8 @@
                 </td>
             </tr>
         </#list>
+        </tbody>
+    </table>
     </#if>
 </div>
 </html>
