@@ -22,9 +22,10 @@
 <article class="card">
     <header>
         <div style="padding: 50px">
+            <#assign jsonInfo=userInfo?eval />
             <div style="background-color: #fff;border: 1px solid #d8dee2;padding: 20px">
+                <p>等级：${jsonInfo.level} 积分：${jsonInfo.credit}</p>
                 <form method="post" action="/user/update" style="width: 350px">
-                    <#assign jsonInfo=userInfo?eval />
                     <label><input type="text" name="name" placeholder="姓名" value="${jsonInfo.name}" style="margin-bottom: 10px"></label>
                     <label><input type="text" name="phone" placeholder="联系电话" value="${jsonInfo.phone}" style="margin-bottom: 10px"></label>
                     <label><input type="text" name="cardNum" placeholder="绑定卡号" value="${jsonInfo.cardNum}" style="margin-bottom: 10px"></label>

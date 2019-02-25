@@ -63,6 +63,17 @@ public class UserServiceImpl implements UserService {
         user = userRepository.findById(userId).orElse(null);
         if (user != null) {
             result = (JSONObject) JSON.toJSON(user);
+            // level of user
+            int credit = user.getCredit();
+            if (credit < 200) {
+                result.put("level", "大众会员");
+            } else if (credit < 600) {
+                result.put("level", "黄金会员");
+            } else if (credit < 1800) {
+                result.put("level", "铂金会员");
+            } else {
+                result.put("level", "钻石会员");
+            }
         }
         return result;
     }
