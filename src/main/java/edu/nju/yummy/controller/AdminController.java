@@ -16,16 +16,23 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/admin")
 public class AdminController {
 
+    private final RestaurantService restaurantService;
+
     @Autowired
-    private RestaurantService restaurantService;
-    @Autowired
-    private UserService userService;
+    public AdminController(RestaurantService restaurantService) {
+        this.restaurantService = restaurantService;
+    }
 
     @GetMapping("/index")
     public String getIndexPage(Model model) {
         JSONArray array = restaurantService.getUncheckedList();
         model.addAttribute("data", array.toJSONString());
         return "admin/index";
+    }
+
+    @GetMapping("/settle")
+    public String getSettlePage() {
+        return "admin/settle";
     }
 
     @PostMapping("/check")

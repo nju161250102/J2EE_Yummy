@@ -20,4 +20,6 @@ public interface OrderService {
 
     void confirmOrder(int orderId);
 
+    double settleOrders();
+
 }

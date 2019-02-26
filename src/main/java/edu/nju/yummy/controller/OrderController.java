@@ -97,4 +97,11 @@ public class OrderController {
         orderService.confirmOrder(orderId);
         return "redirect:/order/info/" + orderId;
     }
+
+    @PostMapping("/settle")
+    public String settleAction(Model model) {
+        double result = orderService.settleOrders();
+        model.addAttribute("info", "结算成功\n总额为：" + result);
+        return "admin/settle";
+    }
 }

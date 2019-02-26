@@ -16,6 +16,7 @@ import java.util.Map;
 @Service
 public class OrderServiceImpl implements OrderService {
 
+    private final String adminCardNum = "677351234567890";
     private final OrderRepository orderRepository;
     private final CancelRecordRepository cancelRecordRepository;
     private final DishRepository dishRepository;
@@ -72,6 +73,8 @@ public class OrderServiceImpl implements OrderService {
                 order.put("status", "待支付");
             } else if (orderStatus == OrderEntity.CONFIRMED) {
                 order.put("status", "已收货");
+            } else if (orderStatus == OrderEntity.SETTLED) {
+                order.put("status", "已结算");
             }
         }
         return results;
@@ -133,11 +136,14 @@ public class OrderServiceImpl implements OrderService {
             result.setInfo("账户余额不足");
         } else {
             // pay
-            account.setMoney(account.getMoney() - order.getSum());
+            double payment = getPayment(order.getSum(), user.getCredit());
+            account.setMoney(account.getMoney() - payment);
+            AccountEntity adminAccount = accountRepository.getOne(adminCardNum);
+            adminAccount.setMoney(adminAccount.getMoney() + payment);
             int credit = getCredit(order.getSum());
             order.setCredit(credit);
             user.setCredit(user.getCredit() + credit);
-            order.setPayment(getPayment(order.getSum(), user.getCredit()));
+            order.setPayment(payment);
             order.setStatus(OrderEntity.PAYED);
             //
             List<OrderItem> orderItems = orderItemRepository.findAllByOrderId(orderId);
@@ -147,6 +153,7 @@ public class OrderServiceImpl implements OrderService {
             }
 
             accountRepository.save(account);
+            accountRepository.save(adminAccount);
             orderRepository.save(order);
             userRepository.save(user);
             result.setSuccess(true);
@@ -162,8 +169,12 @@ public class OrderServiceImpl implements OrderService {
         UserEntity user = userRepository.getOne(order.getUserId());
         user.setCredit(user.getCredit() - order.getCredit());
         AccountEntity account = accountRepository.getOne(user.getCardNum());
+        AccountEntity restAccount = accountRepository.getOne(restaurantRepository.getOne(order.getRestaurantId()).getCardNum());
+        AccountEntity adminAccount = accountRepository.getOne(adminCardNum);
         double refund = getRefund(order.getPayment(), order.getCreateTime().getTime());
         account.setMoney(account.getMoney() + refund);
+        adminAccount.setMoney(adminAccount.getMoney() - order.getPayment());
+        restAccount.setMoney(restAccount.getMoney() + (order.getPayment() - refund));
         CancelRecord record = new CancelRecord();
         record.setOrderId(orderId);
         record.setPayment(order.getPayment());
@@ -173,6 +184,8 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
         userRepository.save(user);
         accountRepository.save(account);
+        accountRepository.save(adminAccount);
+        accountRepository.save(restAccount);
         cancelRecordRepository.save(record);
     }
 
@@ -181,6 +194,22 @@ public class OrderServiceImpl implements OrderService {
         OrderEntity order = orderRepository.getOne(orderId);
         order.setStatus(OrderEntity.CONFIRMED);
         orderRepository.save(order);
+    }
+
+    @Override
+    public double settleOrders() {
+        List<OrderEntity> orders = orderRepository.findAllByStatus(OrderEntity.CONFIRMED);
+        double sum = 0;
+        for (OrderEntity order: orders) {
+            int restId = order.getRestaurantId();
+            RestaurantEntity restaurant = restaurantRepository.getOne(restId);
+            AccountEntity account = accountRepository.getOne(restaurant.getCardNum());
+            account.setMoney(account.getMoney() + 0.8 * order.getPayment());
+            sum += order.getPayment();
+            order.setStatus(OrderEntity.SETTLED);
+            orderRepository.save(order);
+        }
+        return sum;
     }
 
     private double getPayment(double price, int credit) {
