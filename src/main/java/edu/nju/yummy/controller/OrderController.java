@@ -45,7 +45,7 @@ public class OrderController {
     }
 
     @PostMapping("/add")
-    public String addOrder(HttpServletRequest request, HttpSession session) {
+    public String addOrder(Model model, HttpServletRequest request, HttpSession session) {
         int userId = (int) session.getAttribute("id");
         int restId = 0;
         int addressId = 0;
@@ -73,8 +73,12 @@ public class OrderController {
 
     @GetMapping("/info/{id}")
     public String getOrderInfo(@PathVariable("id")int orderId, Model model) {
-        JSONObject order = orderService.getOrder(orderId);
-        model.addAttribute("orderJson", JSONObject.toJSONString(order, mapping));
+        if (orderId == -1) {
+            model.addAttribute("info", "距离遥远，无法送达");
+        } else {
+            JSONObject order = orderService.getOrder(orderId);
+            model.addAttribute("orderJson", JSONObject.toJSONString(order, mapping));
+        }
         return "order/info";
     }
 

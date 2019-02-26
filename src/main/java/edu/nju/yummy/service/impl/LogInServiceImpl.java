@@ -56,7 +56,7 @@ public class LogInServiceImpl implements LogInService {
     }
 
     @Override
-    public ResultModel restaurantRegister(String name, String password, String description, String address, String phone, String cardNum, String cardPassword) {
+    public ResultModel restaurantRegister(String name, String password, String description, String address, String pointInput, String phone, String cardNum, String cardPassword) {
         ResultModel result = new ResultModel();
         try {
             AccountEntity account = accountRepository.findById(cardNum).orElse(null);
@@ -68,6 +68,7 @@ public class LogInServiceImpl implements LogInService {
                 restaurant.setStringId(String.format("%07d", count + 1));
                 restaurant.setName(name);
                 restaurant.setAddress(address);
+                restaurant.setLocation(pointInput);
                 restaurant.setDescription(description);
                 restaurant.setPhone(phone);
                 restaurant.setCardNum(cardNum);

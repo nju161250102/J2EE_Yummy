@@ -52,11 +52,12 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public boolean saveAddress(int userId, String address) {
+    public boolean saveAddress(int userId, String address, String pointInput) {
         try {
             AddressEntity addressEntity = new AddressEntity();
             addressEntity.setDetail(address);
             addressEntity.setUserId(userId);
+            addressEntity.setPoint(pointInput);
             addressRepository.save(addressEntity);
             UserEntity user = userRepository.getOne(userId);
             if (user.getStatus() == UserEntity.INCOMPLETE) {
@@ -68,6 +69,11 @@ public class AddressServiceImpl implements AddressService {
             e.printStackTrace();
             return false;
         }
+    }
+
+    @Override
+    public void delete(int addressId) {
+        addressRepository.deleteById(addressId);
     }
 
 }

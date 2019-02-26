@@ -16,6 +16,7 @@ import java.util.Map;
 @Service
 public class OrderServiceImpl implements OrderService {
 
+    private final double EARTH_RADIUS = 6378.137;
     private final String adminCardNum = "677351234567890";
     private final OrderRepository orderRepository;
     private final CancelRecordRepository cancelRecordRepository;
@@ -23,10 +24,11 @@ public class OrderServiceImpl implements OrderService {
     private final OrderItemRepository orderItemRepository;
     private final RestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
+    private final AddressRepository addressRepository;
     private final AccountRepository accountRepository;
 
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, DishRepository dishRepository, OrderItemRepository orderItemRepository, RestaurantRepository restaurantRepository, UserRepository userRepository, AccountRepository accountRepository, CancelRecordRepository cancelRecordRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, DishRepository dishRepository, OrderItemRepository orderItemRepository, RestaurantRepository restaurantRepository, UserRepository userRepository, AccountRepository accountRepository, CancelRecordRepository cancelRecordRepository, AddressRepository addressRepository) {
         this.orderRepository = orderRepository;
         this.dishRepository = dishRepository;
         this.orderItemRepository = orderItemRepository;
@@ -34,6 +36,7 @@ public class OrderServiceImpl implements OrderService {
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
         this.cancelRecordRepository = cancelRecordRepository;
+        this.addressRepository = addressRepository;
     }
 
 
@@ -99,6 +102,15 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public int addOrder(int userId, int restId, int addressId, String remark, Map<Integer, Integer> orderMap) {
+        // 计算距离
+        RestaurantEntity restaurant = restaurantRepository.getOne(restId);
+        AddressEntity address = addressRepository.getOne(addressId);
+        double[] pointA = getPoint(restaurant.getLocation());
+        double[] pointB = getPoint(address.getPoint());
+        double distance = getDistance(pointA[1], pointA[0], pointB[1], pointB[0]);
+        // System.out.println(distance);
+        if (distance > 15) return -1;
+        // 保存订单
         OrderEntity order = new OrderEntity();
         order.setAddressId(addressId);
         order.setRemark(remark);
@@ -226,5 +238,28 @@ public class OrderServiceImpl implements OrderService {
         if (delta < 300000) return 0.8 * payment;
         else if (delta < 600000) return 0.5 * payment;
         else return 0;
+    }
+
+    private double[] getPoint(String location) {
+        int index = location.indexOf(",");
+        double[] result = {Double.parseDouble(location.substring(0, index)),
+                Double.parseDouble(location.substring(index + 1))};
+        return result;
+    }
+
+    private double rad(double d){
+        return d*Math.PI/180.0;
+    }
+
+    private double getDistance(double lat1, double lng1, double lat2, double lng2) {
+        double radLat1 = rad(lat1);
+        double radLat2 = rad(lat2);
+        double a = radLat1 - radLat2;
+        double b = rad(lng1) - rad(lng2);
+        double s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2) +
+                Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(b / 2), 2)));
+        s = s * EARTH_RADIUS;
+        s = Math.round(s * 10000) / 10000.0;
+        return s;
     }
 }

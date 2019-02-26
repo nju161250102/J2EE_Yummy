@@ -5,8 +5,6 @@
     <title>Yummy - 会员首页</title>
     <link rel="stylesheet" href="/static/css/picnic.min.css" type="text/css" media="all"/>
     <script type="text/javascript" src="/static/js/jquery-1.12.2.min.js"></script>
-    <script>
-    </script>
 </head>
 <body>
 <nav class="demo">
@@ -34,6 +32,7 @@
                 </form>
             </div>
             <br>
+
             <div style="background-color: #fff;border: 1px solid #d8dee2;padding: 20px">
                 <form action="/address/setDefault" method="post" style="width: 350px">
                     <table class="primary">
@@ -41,6 +40,7 @@
                         <tr>
                             <th>ID</th>
                             <th>地址</th>
+                            <th>操作</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -54,18 +54,16 @@
                                     </label>
                                 </td>
                                 <td>${item.detail}</td>
+                                <td>
+                                    <a class="button" href="/address/delete/${item.id}">删除</a>
+                                </td>
                             </tr>
                         </#list>
                         </tbody>
                     </table>
                     <input class='success' type="submit" value="设为默认" style="height: 40px;width: 50%">
                 </form>
-
-                <form action="/address/add" method="post" style="width: 350px">
-                    <label><input type="text" name="address" placeholder="新地址" style="margin-bottom: 10px"></label>
-                    <br>
-                    <input class='button' type="submit" value="加入列表" style="height: 40px;width: 50%">
-                </form>
+                <a class="button" href="/address/page">新地址</a>
             </div>
         </div>
     </header>

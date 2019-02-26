@@ -24,6 +24,8 @@ public class AddressEntity {
     @Column(nullable = false, length = 50)
     private String detail = "";
     @Column(nullable = false)
+    private String point;
+    @Column(nullable = false)
     private int status = AddressEntity.NOT_DEFAULT;
 
 }

@@ -14,6 +14,9 @@ public interface AddressService {
     boolean setDefault(int addressId);
 
     // 保存用户地址
-    boolean saveAddress(int userId, String address);
+    boolean saveAddress(int userId, String address, String pointInput);
+
+    // 删除用户地址
+    void delete(int addressId);
 
 }

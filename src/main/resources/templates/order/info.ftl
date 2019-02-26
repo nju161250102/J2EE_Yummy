@@ -11,8 +11,10 @@
         <span>我的订单</span>
     </a>
 </nav>
-<#assign order=orderJson?eval>
 <div style="padding: 100px 80px">
+    <h3 id="info">${info!}</h3>
+    <#if orderJson??>
+    <#assign order=orderJson?eval>
     <article class="card">
         <header>
             <p>餐厅名称：${order.restaurant}</p>
@@ -62,6 +64,7 @@
             </#if>
         </div>
     </article>
+    </#if>
 </div>
 </body>
 </html>

@@ -57,11 +57,12 @@ public class LogInController {
         String name = request.getParameter("name");
         String password = request.getParameter("password");
         String address = request.getParameter("address");
+        String pointInput = request.getParameter("pointInput");
         String description = request.getParameter("description");
         String phone = request.getParameter("phone");
         String cardNum = request.getParameter("cardNum");
         String cardPassword = request.getParameter("cardPassword");
-        ResultModel result = logInService.restaurantRegister(name, password, description, address, phone, cardNum, cardPassword);
+        ResultModel result = logInService.restaurantRegister(name, password, description, address, pointInput, phone, cardNum, cardPassword);
         model.addAttribute("info", result.getInfo());
         return "register/restaurant";
     }

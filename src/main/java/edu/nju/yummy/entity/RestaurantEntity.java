@@ -26,6 +26,8 @@ public class RestaurantEntity {
     private String name;
     @Column(nullable = false, length = 50)
     private String address;
+    @Column(nullable = false, length = 30)
+    private String location;
     @Column(nullable = false, length = 15)
     private String description;
     @Column(nullable = false, length = 13)
