@@ -21,16 +21,16 @@ public class UserController {
     private final VCodeService vCodeService;
     private final AddressService addressService;
     private final DishService dishService;
-    @Autowired
-    private OrderService orderService;
+    private final StatisticService statisticService;
 
     @Autowired
-    public UserController(UserService userService, VCodeService vCodeService, RestaurantService restaurantService, AddressService addressService, DishService dishService) {
+    public UserController(UserService userService, VCodeService vCodeService, RestaurantService restaurantService, AddressService addressService, DishService dishService, StatisticService statisticService) {
         this.userService = userService;
         this.vCodeService = vCodeService;
         this.restaurantService = restaurantService;
         this.addressService = addressService;
         this.dishService = dishService;
+        this.statisticService = statisticService;
     }
 
     @ResponseBody
@@ -55,6 +55,11 @@ public class UserController {
         JSONArray address = addressService.getAddressList(userId);
         model.addAttribute("userAddress", address.toJSONString());
         return "user/info";
+    }
+
+    @GetMapping("/record")
+    public String getRecordPage() {
+        return "user/record";
     }
 
     @GetMapping("/order")
@@ -84,5 +89,15 @@ public class UserController {
         JSONArray addresses = addressService.getAddressList(userId);
         model.addAttribute("addressJson", addresses.toString());
         return "user/restaurant";
+    }
+
+    @PostMapping("/record")
+    public String searchRecord(HttpServletRequest request, Model model, HttpSession session) {
+        int userId = (int) session.getAttribute("id");
+        String start = request.getParameter("startDate");
+        String end = request.getParameter("endDate");
+        JSONArray result = statisticService.getUserStatistics(userId, start, end);
+        model.addAttribute("result", result.toString());
+        return "user/record";
     }
 }

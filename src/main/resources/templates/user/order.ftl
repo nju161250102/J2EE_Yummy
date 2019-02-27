@@ -12,6 +12,7 @@
     </a>
     <div class="menu">
         <a href="/user/index" class="pseudo button">餐厅列表</a>
+        <a href="/user/record" class="pseudo button">消费统计</a>
         <a href="/user/info" class="pseudo button">个人资料</a>
     </div>
 </nav>
