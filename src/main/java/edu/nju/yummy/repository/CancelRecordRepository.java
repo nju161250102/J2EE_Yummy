@@ -2,6 +2,7 @@ package edu.nju.yummy.repository;
 
 import edu.nju.yummy.entity.CancelRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository

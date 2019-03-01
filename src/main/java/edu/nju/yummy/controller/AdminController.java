@@ -1,8 +1,9 @@
 package edu.nju.yummy.controller;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import edu.nju.yummy.service.RestaurantService;
-import edu.nju.yummy.service.UserService;
+import edu.nju.yummy.service.StatisticService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,10 +18,12 @@ import javax.servlet.http.HttpServletRequest;
 public class AdminController {
 
     private final RestaurantService restaurantService;
+    private final StatisticService statisticService;
 
     @Autowired
-    public AdminController(RestaurantService restaurantService) {
+    public AdminController(RestaurantService restaurantService, StatisticService statisticService) {
         this.restaurantService = restaurantService;
+        this.statisticService = statisticService;
     }
 
     @GetMapping("/index")
@@ -28,6 +31,13 @@ public class AdminController {
         JSONArray array = restaurantService.getUncheckedList();
         model.addAttribute("data", array.toJSONString());
         return "admin/index";
+    }
+
+    @GetMapping("/statistic")
+    public String getStatisticPage(Model model) {
+        JSONObject result =  statisticService.getAdminStatistic();
+        model.addAttribute("result", result.toString());
+        return "admin/statistic";
     }
 
     @GetMapping("/settle")

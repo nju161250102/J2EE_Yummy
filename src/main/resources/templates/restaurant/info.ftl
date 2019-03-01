@@ -13,6 +13,7 @@
     <div class="menu">
         <a href="/restaurant/index" class="pseudo button">菜品列表</a>
         <a href="/restaurant/record" class="pseudo button">送餐记录</a>
+        <a href="/restaurant/statistic" class="pseudo button">财务统计</a>
         <a href="/restaurant/info" class="pseudo button">个人资料</a>
     </div>
 </nav>

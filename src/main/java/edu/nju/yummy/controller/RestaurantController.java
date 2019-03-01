@@ -5,10 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SimpleDateFormatSerializer;
 import edu.nju.yummy.model.ResultModel;
-import edu.nju.yummy.service.DishService;
-import edu.nju.yummy.service.LogInService;
-import edu.nju.yummy.service.OrderService;
-import edu.nju.yummy.service.RestaurantService;
+import edu.nju.yummy.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,6 +27,8 @@ public class RestaurantController {
     private final RestaurantService restaurantService;
     private final DishService dishService;
     private final OrderService orderService;
+    @Autowired
+    private StatisticService statisticService;
 
     @Autowired
     public RestaurantController(RestaurantService restaurantService, LogInService logInService, DishService dishService, OrderService orderService) {
@@ -63,6 +62,21 @@ public class RestaurantController {
         JSONArray orders = orderService.getOrderList(2, id, "all");
         model.addAttribute("orderJson", JSONArray.toJSONString(orders, mapping));
         return "restaurant/record";
+    }
+
+    @GetMapping("statistic")
+    public String getStatisticPage() {
+        return "restaurant/statistic";
+    }
+
+    @PostMapping("statistic")
+    public String getStatistic(Model model, HttpSession session, HttpServletRequest request) {
+        int restId = (int) session.getAttribute("id");
+        String start = request.getParameter("startDate");
+        String end = request.getParameter("endDate");
+        JSONArray result = statisticService.getRestaurantStatistics(restId, start, end);
+        model.addAttribute("result", result.toString());
+        return "restaurant/statistic";
     }
 
     @PostMapping("/update")
