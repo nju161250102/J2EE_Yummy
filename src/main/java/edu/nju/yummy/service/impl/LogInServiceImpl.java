@@ -42,7 +42,7 @@ public class LogInServiceImpl implements LogInService {
             user.setEmail(email);
             user = userRepository.save(user);
             vCodeRepository.delete(vCode);
-            KeyRecord record = new KeyRecord(null, KeyRecord.USER, user.getId(), email, password);
+            KeyRecord record = new KeyRecord(null, UserType.USER, user.getId(), email, password);
             keyRecordRepository.save(record);
             result.setSuccess(true);
             result.setInfo("注册成功");
@@ -52,7 +52,7 @@ public class LogInServiceImpl implements LogInService {
 
     @Override
     public ResultModel userLogin(String email, String password) {
-        return login(KeyRecord.USER, email, password);
+        return login(UserType.USER, email, password);
     }
 
     @Override
@@ -73,7 +73,7 @@ public class LogInServiceImpl implements LogInService {
                 restaurant.setPhone(phone);
                 restaurant.setCardNum(cardNum);
                 restaurant = restaurantRepository.save(restaurant);
-                KeyRecord keyRecord = new KeyRecord(null, KeyRecord.RESTAURANT, restaurant.getId(), restaurant.getStringId(), password);
+                KeyRecord keyRecord = new KeyRecord(null, UserType.RESTAURANT, restaurant.getId(), restaurant.getStringId(), password);
                 keyRecordRepository.save(keyRecord);
                 result.setSuccess(true);
                 result.setInfo("注册成功，您分配的id为：" + restaurant.getStringId());
@@ -87,25 +87,25 @@ public class LogInServiceImpl implements LogInService {
 
     @Override
     public boolean userChangeKey(int userId, String oldPassword, String newPassword) {
-        return changeKey(KeyRecord.USER, userId, oldPassword, newPassword);
+        return changeKey(UserType.USER, userId, oldPassword, newPassword);
     }
 
     @Override
     public ResultModel restaurantLogin(String stringId, String password) {
-        return login(KeyRecord.RESTAURANT, stringId, password);
+        return login(UserType.RESTAURANT, stringId, password);
     }
 
     @Override
     public boolean restaurantChangeKey(int id, String oldPassword, String newPassword) {
-        return changeKey(KeyRecord.RESTAURANT, id, oldPassword, newPassword);
+        return changeKey(UserType.RESTAURANT, id, oldPassword, newPassword);
     }
 
     @Override
     public ResultModel adminLogin(String adminName, String password) {
-        return login(KeyRecord.ADMIN, adminName, password);
+        return login(UserType.ADMIN, adminName, password);
     }
 
-    private ResultModel login(int type, String username, String password) {
+    private ResultModel login(UserType type, String username, String password) {
         ResultModel result = new ResultModel();
         Integer userId = keyRecordRepository.checkIdentity(type, username, password);
         if (userId == null) {
@@ -118,8 +118,8 @@ public class LogInServiceImpl implements LogInService {
         return result;
     }
 
-    private boolean changeKey(int type, int id, String oldPassword, String newPassword) {
-        KeyRecord record = keyRecordRepository.findByIdentityAndLogId(type, id);
+    private boolean changeKey(UserType type, int id, String oldPassword, String newPassword) {
+        KeyRecord record = keyRecordRepository.findByUserTypeAndLogId(type, id);
         if (record != null && oldPassword.equals(record.getPassword())) {
             record.setPassword(newPassword);
             keyRecordRepository.save(record);

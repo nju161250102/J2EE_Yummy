@@ -5,10 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -17,15 +14,12 @@ import javax.persistence.Id;
 @AllArgsConstructor
 public class KeyRecord {
 
-    public static final int ADMIN = 0;
-    public static final int USER = 1;
-    public static final int RESTAURANT = 2;
-
     @Id
     @GeneratedValue
     private Integer id;
-    @Column
-    private int identity;
+    @Column(name = "identity")
+    @Enumerated(EnumType.ORDINAL)
+    private UserType userType;
     @Column
     private int logId;
     @Column(nullable = false, length = 50)

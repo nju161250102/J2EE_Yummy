@@ -64,12 +64,12 @@ public class RestaurantController {
         return "restaurant/record";
     }
 
-    @GetMapping("statistic")
+    @GetMapping("/statistic")
     public String getStatisticPage() {
         return "restaurant/statistic";
     }
 
-    @PostMapping("statistic")
+    @PostMapping("/statistic")
     public String getStatistic(Model model, HttpSession session, HttpServletRequest request) {
         int restId = (int) session.getAttribute("id");
         String start = request.getParameter("startDate");
