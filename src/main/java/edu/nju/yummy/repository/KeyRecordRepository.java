@@ -16,4 +16,7 @@ public interface KeyRecordRepository extends JpaRepository<KeyRecord, Integer> {
     @Nullable
     KeyRecord findByUserTypeAndLogId(UserType userType, int logId);
 
+    @Nullable
+    KeyRecord findByUserTypeAndLogName(UserType userType, String logName);
+
 }
