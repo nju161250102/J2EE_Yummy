@@ -66,6 +66,7 @@
                 </form>
                 <a class="button" href="/address/page">新地址</a>
             </div>
+            <a class="button dangerous" href="/user/delete">注销账户</a>
         </div>
     </header>
     <footer>

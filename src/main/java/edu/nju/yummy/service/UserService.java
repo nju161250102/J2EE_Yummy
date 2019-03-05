@@ -10,4 +10,6 @@ public interface UserService {
 
     // JSON
     JSONObject getUser(int userId);
+
+    void delete(int userId);
 }

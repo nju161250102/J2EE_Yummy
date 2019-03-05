@@ -100,4 +100,12 @@ public class UserController {
         model.addAttribute("result", result.toString());
         return "user/record";
     }
+
+    @GetMapping("/delete")
+    public String deleteUser(HttpSession session) {
+        int userId = (int) session.getAttribute("id");
+        userService.delete(userId);
+        session.removeAttribute("id");
+        return "redirect:/index";
+    }
 }

@@ -78,4 +78,11 @@ public class UserServiceImpl implements UserService {
         return result;
     }
 
+    @Override
+    public void delete(int userId) {
+        UserEntity user = userRepository.getOne(userId);
+        user.setStatus(UserEntity.DELETED);
+        userRepository.save(user);
+    }
+
 }
