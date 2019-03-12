@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SimpleDateFormatSerializer;
+import edu.nju.yummy.form.RestaurantInfoForm;
 import edu.nju.yummy.model.ResultModel;
 import edu.nju.yummy.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.sql.Date;
 import java.sql.Timestamp;
 
@@ -27,17 +29,17 @@ public class RestaurantController {
     private final RestaurantService restaurantService;
     private final DishService dishService;
     private final OrderService orderService;
-    @Autowired
-    private StatisticService statisticService;
+    private final StatisticService statisticService;
 
     @Autowired
-    public RestaurantController(RestaurantService restaurantService, LogInService logInService, DishService dishService, OrderService orderService) {
+    public RestaurantController(RestaurantService restaurantService, LogInService logInService, DishService dishService, OrderService orderService, StatisticService statisticService) {
         this.restaurantService = restaurantService;
         this.logInService = logInService;
         this.dishService = dishService;
         this.orderService = orderService;
         mapping.put(Date.class, new SimpleDateFormatSerializer("yyyy-MM-dd"));
         mapping.put(Timestamp.class, new SimpleDateFormatSerializer("yyyy-MM-dd HH:mm:ss"));
+        this.statisticService = statisticService;
     }
 
     @GetMapping("/index")
@@ -80,13 +82,9 @@ public class RestaurantController {
     }
 
     @PostMapping("/update")
-    public String updateInfo(HttpServletRequest request, HttpSession session) {
+    public String updateInfo(@Valid RestaurantInfoForm form, HttpSession session) {
         int id = (int) session.getAttribute("id");
-        String name = request.getParameter("name");
-        String phone = request.getParameter("phone");
-        String address = request.getParameter("address");
-        String description = request.getParameter("description");
-        ResultModel result = restaurantService.updateInfo(id, name, address, description, phone);
+        ResultModel result = restaurantService.updateInfo(id, form.getName(), form.getAddress(), form.getDescription(), form.getPhone());
         return "redirect:/restaurant/info";
     }
 

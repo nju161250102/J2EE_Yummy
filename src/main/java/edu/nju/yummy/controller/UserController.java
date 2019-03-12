@@ -2,6 +2,7 @@ package edu.nju.yummy.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import edu.nju.yummy.form.UserInfoForm;
 import edu.nju.yummy.model.ResultModel;
 import edu.nju.yummy.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/user")
@@ -68,13 +70,9 @@ public class UserController {
     }
 
     @PostMapping("/update")
-    public String updateInfo(Model model, HttpServletRequest request, HttpSession session) {
+    public String updateInfo(@Valid UserInfoForm form, Model model, HttpSession session) {
         int userId = (int) session.getAttribute("id");
-        String name = request.getParameter("name");
-        String phone = request.getParameter("phone");
-        String cardNum = request.getParameter("cardNum");
-        String cardPassword = request.getParameter("cardPassword");
-        ResultModel result = userService.updateInfo(userId, name, phone, cardNum, cardPassword);
+        ResultModel result = userService.updateInfo(userId, form.getName(), form.getPhone(), form.getCardNum(), form.getCardPassword());
         model.addAttribute("info", result.getData());
         return "redirect:/user/info";
     }

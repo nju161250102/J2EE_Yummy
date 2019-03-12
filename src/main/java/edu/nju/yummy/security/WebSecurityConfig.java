@@ -35,7 +35,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests()
                 .antMatchers("/").permitAll()
-                .antMatchers("/static/**").permitAll() //默认不拦截静态资源的url pattern （2）
+                .antMatchers("/static/**").permitAll()
+                .antMatchers("/user/register").permitAll()
+                .antMatchers("/restaurant/register").permitAll()
+                .antMatchers("/register/**").permitAll()
+                .antMatchers("/error").permitAll()
                 .anyRequest().authenticated().and()
                 .formLogin().loginPage("/").loginProcessingUrl("/login")// 登录url请求路径
                 .defaultSuccessUrl("/index").successHandler(new LoginSuccessHandle())

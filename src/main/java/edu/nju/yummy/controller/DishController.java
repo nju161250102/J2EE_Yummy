@@ -2,6 +2,7 @@ package edu.nju.yummy.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import edu.nju.yummy.form.DishForm;
 import edu.nju.yummy.service.DishService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,15 +27,9 @@ public class DishController {
     }
 
     @PostMapping("/add")
-    public String addDish(HttpServletRequest request, HttpSession session) {
+    public String addDish(DishForm form, HttpSession session) {
         int restId = (int) session.getAttribute("id");
-        String name = request.getParameter("name");
-        String price = request.getParameter("price");
-        String num = request.getParameter("num");
-        String startDate = request.getParameter("startDate");
-        String endDate = request.getParameter("endDate");
-        String type = request.getParameter("type");
-        dishService.addDish(restId, name, startDate, endDate, price == null ? null : Double.parseDouble(price), Integer.parseInt(num), "package".equals(type));
+        dishService.addDish(restId, form.getName(), form.getStartDate(), form.getEndDate(), form.getPrice(), form.getNum(), "package".equals(form.getType()));
         return "redirect:/restaurant/index";
     }
 
