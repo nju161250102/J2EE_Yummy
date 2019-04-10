@@ -225,6 +225,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private double getPayment(double price, int credit) {
+        if (credit > 400) return price * 0.8;
+        if (credit > 200) return price * 0.9;
         return price;
     }
 

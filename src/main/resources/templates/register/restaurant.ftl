@@ -4,9 +4,9 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Yummy - 餐厅注册</title>
     <link href="/static/address/public.css" rel="stylesheet" type="text/css">
-    <script src="/static/address/hm.asc"></script>
-    <script type="text/javascript" src="/static/address/api"></script>
-    <script type="text/javascript" src="/static/address/getscript"></script>
+    <script src="/static/address/hm.js"></script>
+    <script type="text/javascript" src="/static/address/api.js"></script>
+    <script type="text/javascript" src="/static/address/getscript.js"></script>
     <script type="text/javascript" src="/static/address/tangram.js"></script>
     <script type="text/javascript" src="/static/address/mapext.js"></script>
     <script type="text/javascript" src="/static/address/public.js"></script>

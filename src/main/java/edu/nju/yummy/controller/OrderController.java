@@ -48,7 +48,7 @@ public class OrderController {
     public String addOrder(Model model, HttpServletRequest request, HttpSession session) {
         int userId = (int) session.getAttribute("id");
         int restId = 0;
-        int addressId = 0;
+        int addressId = -1;
         String remark = "";
         Enumeration<String> paramEnum = request.getParameterNames();
         Map<Integer, Integer> orderMap = new HashMap<>();
@@ -66,6 +66,10 @@ public class OrderController {
                     orderMap.put(Integer.parseInt(paramName), Integer.parseInt(param));
                 }
             }
+        }
+        if (addressId == -1) {
+            model.addAttribute("info", "请先完善信息");
+            return "order/info";
         }
         int orderId = orderService.addOrder(userId, restId, addressId, remark, orderMap);
         return "redirect:/order/info/" + orderId;

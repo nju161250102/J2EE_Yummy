@@ -22,7 +22,7 @@ public class ScheduledTasks {
     public void checkOrders() {
         List<OrderEntity> orders = orderRepository.findAllByStatus(OrderEntity.WAIT);
         for (OrderEntity order: orders) {
-            if (System.currentTimeMillis() - order.getCreateTime().getTime() > 15*60*1000) {
+            if (System.currentTimeMillis() - order.getCreateTime().getTime() > 2*60*1000) {
                 order.setStatus(OrderEntity.OUT_TIME);
             }
         }

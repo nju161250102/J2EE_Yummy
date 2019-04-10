@@ -2,6 +2,8 @@ package edu.nju.yummy.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import edu.nju.yummy.entity.AddressEntity;
+import edu.nju.yummy.entity.UserEntity;
 import edu.nju.yummy.form.UserInfoForm;
 import edu.nju.yummy.model.ResultModel;
 import edu.nju.yummy.service.*;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.List;
 
 @Controller
 @RequestMapping("/user")
@@ -43,7 +46,7 @@ public class UserController {
     }
 
     @GetMapping("/index")
-    public String getIndexPage(Model model) {
+    public String getIndexPage(Model model, HttpSession session) {
         JSONArray list = restaurantService.getAvailableList();
         model.addAttribute("data", list.toJSONString());
         return "user/index";

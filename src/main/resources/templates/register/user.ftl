@@ -19,7 +19,7 @@
         <div align="center">
             <form method="post" action="/user/register" style="width: 350px">
                 <div style="background-color: #fff;border: 1px solid #d8dee2;padding: 20px">
-                    <label><input id="email" type="email" name="mail" placeholder="邮箱" style="margin-bottom: 10px"></label>
+                    <label><input id="email" type="email" name="email" placeholder="邮箱" style="margin-bottom: 10px"></label>
                     <div class="flex two">
                         <div class="half">
                             <input type="text" name="code" placeholder="验证码">
